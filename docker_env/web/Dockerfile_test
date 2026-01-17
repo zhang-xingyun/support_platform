@@ -1,0 +1,9 @@
+FROM hub.test.com/builder/node14-base-web:latest
+WORKDIR /web/
+COPY web/. .
+RUN npm install --registry=https://art-internal.test.com/artifactory/api/npm/npm/
+RUN npm run build
+
+FROM art-internal.test.com/library/nginx:alpine
+COPY ./docker_env/nginx/test.conf /etc/nginx/conf.d/test.conf
+COPY --from=0 /web/dist /usr/share/nginx/html
